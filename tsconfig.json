@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "es2017",                                
+    "module": "commonjs",                           
+    "allowJs": true,                             
+    "esModuleInterop": true,                        
+    "skipLibCheck": true,                           
+    "forceConsistentCasingInFileNames": true,
+    "rootDir": ".",
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "removeComments": false,
+    "noEmit": false,
+    "typeRoots": [
+      "./node_modules/@types",
+      "functions/@types"
+    ]
+  },
+  "include": [
+    "functions/**/*.ts",
+    "functions",
+    "./index.ts",
+    "package.json",
+    "package-lock.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "*.test.ts",
+    "functions/**/*.test.ts"
+  ],
+}
