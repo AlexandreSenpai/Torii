@@ -1,23 +1,29 @@
-import { Entity } from "./entity";
-import { PolicyRequestProps } from "./policyRequest";
-
-export interface DecisionProps {
-    grant: boolean
-    context: PolicyRequestProps
-    reason: string[]
-}
+import { z } from "zod";
+import { Entity, PropsWithDefaultFields } from "./entity";
+import { policyRequestSchema } from "./policy-request";
 
 export class Grant {
-    static Deny = false
-    static Allow = true
+    static readonly ALLOW = true
+    static readonly DENY = false
 }
 
-export class Decision extends Entity<DecisionProps> {
-    constructor(props: DecisionProps) {
-        super(props);
+export const decisionSchema = z.object({
+    grant: z.boolean(),
+    context: policyRequestSchema, 
+    reason: z.array(z.any().transform(val => String(val)))
+})
+
+const DecisionSchemaInput = decisionSchema._input;
+const DecisionSchemaOutput = decisionSchema._output;
+
+export class Decision extends Entity<typeof DecisionSchemaInput, typeof DecisionSchemaOutput> {
+    constructor(props: typeof DecisionSchemaInput, id?: string, createdAt?: Date, updatedAt?: Date) {
+        super(props, decisionSchema, id, createdAt, updatedAt);
     }
 
-    static create(props: DecisionProps): Decision {
-        return new Decision(props);
+    static create(data: PropsWithDefaultFields<typeof DecisionSchemaInput>): Decision {
+        const { id, createdAt, updatedAt, ...props } = data;
+
+        return new Decision(props, id, createdAt, updatedAt);
     }
 }

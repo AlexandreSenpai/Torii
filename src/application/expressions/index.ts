@@ -1,10 +1,12 @@
+export type AllowedExpressions = "equalTo" | "differentOf" | "matchesWithEmailDomain" | "hourGreaterThan" | "hourLowerThan" 
+
 export class Expressions {
 
     private static equalTo(input: { value: string | boolean | number, compareTo: string | boolean | number }): boolean {
-        if(typeof input.compareTo === 'string' && input.compareTo.endsWith('*')) {
-         const compareToWithoutAsterisk = input.compareTo.replace('*', '')
-         const userRequestPath = input.value.toString().toLowerCase()
-         return userRequestPath.includes(compareToWithoutAsterisk);
+        if(typeof input.compareTo === 'string' && input.compareTo?.endsWith('*')) {
+         const compareToWithoutAsterisk = input.compareTo?.replace('*', '')
+         const userRequestPath = input.value?.toString()?.toLowerCase()
+         return userRequestPath?.includes(compareToWithoutAsterisk);
         }
 
         return input.value === input.compareTo;
@@ -29,15 +31,16 @@ export class Expressions {
         return input.value.getHours() > input.compareTo;
     }
 
-    public static getExpression(input: { expressionValue: string }): any {
+    public static getExpression(input: { expressionValue: AllowedExpressions }): any {
         const expressions = {
             "equalTo": this.equalTo,
             "differentOf": this.differentOf,
-            "matchesToEmailDomain": this.matchesToEmailDomain,
+            "matchesWithEmailDomain": this.matchesToEmailDomain,
             "hourGreaterThan": this.hourGreaterThan,
             "hourLowerThan": this.hourLowerThan
         }
         
         return expressions[input.expressionValue];
     }
+    
 }

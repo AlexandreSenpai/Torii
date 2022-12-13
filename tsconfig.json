@@ -2,8 +2,9 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "strict": true,
     "target": "es2017",                                
-    "module": "commonjs",                           
+    "module": "commonjs",                    
     "allowJs": true,                             
     "esModuleInterop": true,                        
     "skipLibCheck": true,                           
@@ -11,6 +12,8 @@
     "rootDir": ".",
     "outDir": "./dist",
     "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
     "removeComments": false,
     "noEmit": false,
     "typeRoots": [

@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express'
 import { ABAC } from '../../../application' 
 import { decode, JwtPayload } from 'jsonwebtoken'
 
-function middleware(input: { ABACInstance: ABAC, policiesNames?: string[] }) {
-    function decodeJWT({ jwt }: { jwt: string }): JwtPayload | string | null {
+function middleware(input: { ABACInstance: ABAC, policiesNames: string[] }) {
+    function decodeJWT({ jwt }: { jwt?: string }): JwtPayload | string | null {
         if(!jwt) return null
 
         try {
@@ -18,10 +18,12 @@ function middleware(input: { ABACInstance: ABAC, policiesNames?: string[] }) {
     const enforcement = input.ABACInstance.getAuthLogic()
 
     return (request: Request, response: Response, next: NextFunction) => {
-        
-        request['subject'] = decodeJWT({ jwt: request?.headers?.authorization })
 
-        if(request['subject'] === null) return response.status(401).json({
+        const subject = decodeJWT({ jwt: request?.headers?.authorization })
+        const context = { ...request.params, ...request.query, ip: request.ip }
+        const resource = { path: request.url }
+
+        if(subject === null) return response.status(401).json({
             message: "Access denied.",
             status: 401,
             reason: [
@@ -29,15 +31,24 @@ function middleware(input: { ABACInstance: ABAC, policiesNames?: string[] }) {
             ]
         })
 
-        request['context'] = { ...request.params, ...request.query }
-
-        enforcement.enforce({ request: request, policiesName: input.policiesNames }).then(decision => {
-            const { grant, reason } = decision.decision.props
+        enforcement.enforce({ 
+            request: { 
+                context,
+                subject: subject as Object,
+                ip: request.path,
+                method: request.method,
+                params: request.params,
+                query: request.query,
+                resource
+            }, 
+            policiesName: input.policiesNames 
+        }).then(decision => {
+            const { grant, reason } = decision.decision.data()
             if(grant) next()
             else return response.status(403).json({ 
                 message: "Access denied.",
                 status: 403,
-                reason 
+                reason
             })
         })
     }

@@ -1,8 +1,18 @@
-import { Request } from 'express'
-
 import { Decision } from "../../core/entities/decision";
-import { PolicyRequest } from '../../core/entities/policyRequest'
+import { PolicyRequest } from '../../core/entities/policy-request'
 import { PDP } from "../PDP";
+
+type AllowedActions = "GET" | "POST" | "PUT" | "DELETE"
+
+export interface RequestDTO {
+    ip: string,
+    method: string,
+    resource: { [key: string]: any }, 
+    subject: { [key: string]: any }, 
+    context: { [key: string]: any },
+    params: { [key: string]: any },
+    query: { [key: string]: any }
+} 
 
 export class PEP {
     /**
@@ -11,7 +21,7 @@ export class PEP {
      */
     constructor(private readonly policyDecisionPoint: PDP) {}
 
-    private createActionField(action: string): { [key: string]: any } {
+    private createActionField(action: AllowedActions): { [key: string]: any } {
         const actions = {
             GET: {   
                 read: 'get'
@@ -29,11 +39,11 @@ export class PEP {
         return actions[action] ?? {}
     }
 
-    public async enforce(input: { request: Request, policiesName?: string[], roles?: string[] }): Promise<{ decision: Decision }> {
+    public async enforce(input: { request: RequestDTO, policiesName: string[] }): Promise<{ decision: Decision }> {
+
         const policyRequest = PolicyRequest.create({
-            actions: this.createActionField(input.request.method),
+            actions: this.createActionField(input.request.method as AllowedActions),
             resource: {
-                path: input.request.url,
                 ...input.request['resource']
             },
             subjects: {
@@ -41,15 +51,12 @@ export class PEP {
                 ...input.request['subject']
             },
             context: {
-                ip: input.request.ip,
                 requestTime: new Date(),
                 ...input.request['context'],
-                ...input.request.params,
-                ...input.request.query
             }
         })
 
-        const { decision } = await this.policyDecisionPoint.evaluate({ policiesName: input.policiesName, roles: input.roles, policyRequest })
+        const { decision } = await this.policyDecisionPoint.evaluate({ policiesName: input.policiesName, policyRequest })
 
         return { decision }
     }

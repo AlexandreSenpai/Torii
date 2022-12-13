@@ -1,4 +1,5 @@
-import { PolicyRequest } from "../src/application/core/entities/policyRequest"
+import { expect, it } from 'vitest';
+import { PolicyRequest } from '../src/application/core/entities/policy-request'
 
 it('should instantiate correctly a policy request', () => {
     const request = PolicyRequest.create({
@@ -15,11 +16,12 @@ it('should instantiate correctly a policy request', () => {
             email: 'alexandreramos@gmail.com'
         }
     })
+
+    const data = request.data()
     expect(request).toBeInstanceOf(PolicyRequest)
-    expect(request.props.actions.read).toBe('get')
-    expect(request.id).toBeDefined()
-    expect(request.interactionTime).toBeInstanceOf(Date)
-    expect(request.props.subjects.email).toBe('alexandreramos@gmail.com')
+    expect(data.actions.read).toBe('get')
+    expect(data.id).toBeDefined()
+    expect(data.subjects.email).toBe('alexandreramos@gmail.com')
 })
 
 it('should merge the policy request and return a JSON successfully', () => {
@@ -36,7 +38,9 @@ it('should merge the policy request and return a JSON successfully', () => {
         subjects: {
             email: 'alexandreramos@gmail.com'
         }
-    })
-    const jsonObject = request.toJSON()
-    expect(jsonObject).toBeInstanceOf(Object)
+    }).data()
+
+    console.log(request)
+
+    expect(request).toBeInstanceOf(Object)
 })

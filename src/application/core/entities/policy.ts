@@ -1,45 +1,43 @@
-import { Entity } from "./entity";
+import { Entity, PropsWithDefaultFields } from "./entity";
+import { z } from "zod";
+import { AllowedExpressions } from "../../expressions";
 
-export interface PolicyProps {
-    id: string
-    updatedAt: string,
-    createdAt: string,
-    name: string
-    description: string
-    effect: string
-    appliesTo: string[]
-    actions: { 
-        [key: string]: {
-            expression: string,
-            value: any
-        }
-    },
-    subjects: { 
-        [key: string]: {
-            expression: string,
-            value: any
-        }
-    },
-    resource: {
-        [key: string]: {
-            expression: string,
-            value: any
-        }
-    },
-    context: {
-        [key: string]: {
-            expression: string,
-            value: any
-        }
-    }
-}
+const policySchema = z.object({
+    name: z.string().transform(val => String(val)),
+    description: z.string().nullable(),
+    effect: z.enum(['allow', 'deny']),
+    appliesTo: z.array(z.string()).transform(array => array.map(val => String(val))),
+    actions: z.record(z.object({
+        expression: z.enum([ "equalTo", "differentOf", "matchesWithEmailDomain", "hourGreaterThan", "hourLowerThan" ]),
+        value: z.any()
+    })),
+    subjects: z.record(z.object({
+        expression: z.enum([ "equalTo", "differentOf", "matchesWithEmailDomain", "hourGreaterThan", "hourLowerThan" ]),
+        value: z.any()
+    })),
+    resource: z.record(z.object({
+        expression: z.enum([ "equalTo", "differentOf", "matchesWithEmailDomain", "hourGreaterThan", "hourLowerThan" ]),
+        value: z.any()
+    })),
+    context: z.record(z.object({
+        expression: z.enum([ "equalTo", "differentOf", "matchesWithEmailDomain", "hourGreaterThan", "hourLowerThan" ]),
+        value: z.any()
+    }))
+});
 
-export class Policy extends Entity<PolicyProps> {
-    private constructor(props: PolicyProps, id: string, interactionTime: Date) {
-        super(props, id, interactionTime)
+export type AttributeField = Record<string, { value?: any; expression: AllowedExpressions; }>;
+
+const PolicySchemaInput = policySchema._input;
+const PolicySchemaOutput = policySchema._output;
+
+export class Policy extends Entity<typeof PolicySchemaInput, typeof PolicySchemaOutput> {
+    private constructor(props: typeof PolicySchemaInput, id?: string, createdAt?: Date, updatedAt?: Date) {
+        super(props, policySchema, id, createdAt, updatedAt);
     }
 
-    public static create(props: PolicyProps): Policy {
-        return new Policy(props, props.id, new Date(props.updatedAt))
+    public static create(data: PropsWithDefaultFields<typeof PolicySchemaInput>): Policy {
+        const { id, createdAt, updatedAt, ...props } = data;
+
+        return new Policy(props, id, createdAt, updatedAt);
     }
 }

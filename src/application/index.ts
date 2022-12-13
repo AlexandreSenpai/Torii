@@ -1,19 +1,19 @@
-import { PEP } from './layers/PEP'
+import { IDatabaseRepository } from '../infra/core/interfaces/repositories/database-repository.base'
+import { Policy } from './core/entities/policy'
 import { PDP } from './layers/PDP'
+import { PEP } from './layers/PEP'
 import { PIP } from './layers/PIP'
-import { IDatabaseRepository } from '../infra/adapters/database/repositories/IDatabaseRepository'
 
 export class ABAC{
     private logic: PEP
 
     constructor(input: { 
-        policyRepository: IDatabaseRepository
+        policyRepository: IDatabaseRepository<Policy>
     }){
         this.logic = new PEP(
             new PDP(
                 new PIP(
-                    input.policyRepository,
-                    input.roleRepository
+                    input.policyRepository
                 )
             )
         )
