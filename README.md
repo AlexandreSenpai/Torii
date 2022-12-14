@@ -1,7 +1,7 @@
 # Torii - ABAC Authorization
 
 <p align="center">
-  <img src="./docs/image/logo.jpg" width="300" />
+  <img src="./docs/image/logo.png" width="350" />
 </p>
 
 <h1 align="center">
