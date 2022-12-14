@@ -63,54 +63,47 @@ To create a security policy the creator has to provide some informations such as
 
 ```json
 {
-  effect: "allow",
-  appliesTo: {
-    role: {
+  "effect": "allow",
+  "appliesTo": {
+    "role": {
       "value": ["editor", "admin"],
       "expression": "includes" 
     },
-    user_id: {
+    "user_id": {
       "value": "1234",
       "expression": "equalTo"
     }
-  },
-  actions: {
-    query: {
+  }, // To whom this policy applies. Object keys points to JWT keys.
+  "actions": {
+    "query": {
       "value": "GET",
       "expression": "equalTo"
     }
-  },
-  subjects: {
-      role: {
-          expression: "equalTo",
-          value: "partner"
+  }, // Action that the requester is allowed to perform: Querys or Mutations
+  "subjects": {
+      "role": {
+          "expression": "equalTo",
+          "value": "partner"
       },
-      partner: {
-          expression: "matchesToEmailDomain",
-          value: "$.subjects.email"
+      "organization": {
+          "expression": "matchesToEmailDomain",
+          "value": "$.subjects.email"
       }
+  }, // Checking requester properties. This field is filled with JWT decode information
+  "resource": {
+      "path": {
+          "expression": "equalTo",
+          "value": "/orders/rest"
+      } // Checking the resource that requester is trying to interact with.
   },
-  resource: {
-      path: {
-          expression: "equalTo",
-          value: "/orders/rest"
-      }
-  },
-  context: {
-      ip: {
-          expression: "equalTo",
-          value: "::1"
-      }
+  "context": {
+      "ip": {
+          "expression": "equalTo",
+          "value": "::1"
+      } // Checking the current context of the requester such as: request date time, ip and more
   }
 }
 ```
-- **effect**: Policy validation result.
-- **appliesTo**: To whom this policy applies. Object keys points to JWT keys.
-- **actions**: Action that the requester is allowed to perform: Querys or Mutations.
-- **subjects**: Checking requester properties. This field is filled with JWT decode information.
-- **resource**: Checking the resource that requester is trying to interact with.
-- **context**: Checking the current context of the requester such as: request date time, ip and more.
-
 At the moment of the request Torii will create a request policy.
 ```json
 {
