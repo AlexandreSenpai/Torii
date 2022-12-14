@@ -1,14 +1,18 @@
 # Torii - ABAC Authorization
 
-<center>
+<p align="center">
   <img src="./docs/image/logo.jpg" width="300" />
-  
+</p>
+
+<h1 align="center">
+
 [![CodeFactor](https://www.codefactor.io/repository/github/alexandresenpai/nhentai-api/badge)](https://www.codefactor.io/repository/github/alexandresenpai/torii)
 [![PyPI download month](https://img.shields.io/npm/dm/@torii-auth/authorization?style=flat-square)](https://www.npmjs.com/package/@torii-auth/authorization)
 [![codecov](https://codecov.io/gh/AlexandreSenpai/Torii/branch/dev/graph/badge.svg?token=F3LP15DYMR)](https://codecov.io/gh/AlexandreSenpai/Torii)
 ![NPM Version](https://img.shields.io/npm/v/@torii-auth/authorization?style=flat-square)
 ![NPM license](https://img.shields.io/npm/l/@torii-auth/authorization?style=flat-square)
-</center>
+
+</h1>
 
 ## Authorization Granularity
 One of the key benefits of implement ABAC authorization is the possibility of implement granularity without having to create a thousand of roles that will try to filter the permission as possible to achieve what you can do, sometimes with only one security policy.
