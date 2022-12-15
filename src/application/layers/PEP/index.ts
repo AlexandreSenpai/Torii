@@ -1,17 +1,14 @@
-import { Decision } from "../../core/entities/decision";
+import { Decision } from "../../core/entities/decision"
 import { PolicyRequest } from '../../core/entities/policy-request'
 import { PDP } from "../PDP";
 
 type AllowedActions = "GET" | "POST" | "PUT" | "DELETE"
 
 export interface RequestDTO {
-    ip: string,
-    method: string,
     resource: { [key: string]: any }, 
     subject: { [key: string]: any }, 
     context: { [key: string]: any },
-    params: { [key: string]: any },
-    query: { [key: string]: any }
+    action: { [key: string]: any }
 } 
 
 export class PEP {
@@ -23,17 +20,17 @@ export class PEP {
 
     private createActionField(action: AllowedActions): { [key: string]: any } {
         const actions = {
-            GET: {   
-                read: 'get'
+            GET: {
+                query: 'get'
             },
             POST: {
-                write: 'post'
+                mutation: 'post'
             },
             PUT: {
-                write: 'put'
+                mutation: 'put'
             },
             DELETE: {
-                delete: 'delete'
+                mutation: 'delete'
             }
         }
         return actions[action] ?? {}
@@ -42,7 +39,7 @@ export class PEP {
     public async enforce(input: { request: RequestDTO, policiesName: string[] }): Promise<{ decision: Decision }> {
 
         const policyRequest = PolicyRequest.create({
-            actions: this.createActionField(input.request.method as AllowedActions),
+            actions: this.createActionField(input.request?.action?.method),
             resource: {
                 ...input.request['resource']
             },

@@ -3,4 +3,5 @@ export { IDatabaseRepository } from './src/infra/core/interfaces/repositories/da
 export { PolicySchema } from './src/infra/core/interfaces/schemas/policy.base'
 export { Policy } from './src/application/core/entities/policy'
 export { PolicyRequest } from './src/application/core/entities/policy-request'
+export { Expressions, AllowedExpressions } from './src/application/expressions'
 export { can, cannot } from './src/infra/entrypoints/middleware'

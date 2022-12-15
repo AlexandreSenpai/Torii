@@ -22,6 +22,7 @@ function middleware(input: { ABACInstance: ABAC, policiesNames: string[] }) {
         const subject = decodeJWT({ jwt: request?.headers?.authorization })
         const context = { ...request.params, ...request.query, ip: request.ip }
         const resource = { path: request.url }
+        const action = { method: request.method }
 
         if(subject === null) return response.status(401).json({
             message: "Access denied.",
@@ -35,16 +36,13 @@ function middleware(input: { ABACInstance: ABAC, policiesNames: string[] }) {
             request: { 
                 context,
                 subject: subject as Object,
-                ip: request.path,
-                method: request.method,
-                params: request.params,
-                query: request.query,
-                resource
+                resource,
+                action
             }, 
             policiesName: input.policiesNames 
         }).then(decision => {
             const { grant, reason } = decision.decision.data()
-            if(grant) next()
+            if(grant) return next();
             else return response.status(403).json({ 
                 message: "Access denied.",
                 status: 403,

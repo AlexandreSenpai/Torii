@@ -1,8 +1,7 @@
 import { PIP } from "../PIP";
-
 import { Decision, Grant } from '../../core/entities/decision'
-import { Expressions } from '../../expressions'
-import { AttributeField, Policy } from "../../core/entities/policy";
+import { AllowedExpressions, Expressions } from "../../expressions";
+import { Policy } from "../../core/entities/policy";
 import { AllowedFieldKeys, PolicyRequest } from "../../core/entities/policy-request";
 
 export class PDP {
@@ -11,14 +10,20 @@ export class PDP {
      * This is the piece which evaluates incoming requests against policies it has been configured with. 
      * The PDP returns a Permit/ Deny decision. The PDP may also use PIPs to retrieve missing metadata
      */
-    constructor(private readonly policyInformationPoint: PIP) {}
+    constructor(
+        private readonly policyInformationPoint: PIP, 
+        private readonly expressions: Expressions
+    ) {}
 
-    public checkAttributeField(input: { fieldKey: AllowedFieldKeys, policyAttrField: AttributeField, policyRequest: PolicyRequest }): { grant: boolean, reason: string } {
+    public checkAttributeField(input: { 
+        fieldKey: AllowedFieldKeys, 
+        policyAttrField: Record<string, { value?: any; expression: string; }>, 
+        policyRequest: PolicyRequest }): { grant: boolean, reason: string } {
         
         for(const field in input.policyAttrField ?? []) {
             const expressionIdentifier = input.policyAttrField[field]?.expression;
-            const policyRequestField = input.policyRequest.data()[input.fieldKey][field]
-            const expressionFunction = Expressions.getExpression({ expressionValue: expressionIdentifier })
+            const policyRequestField = input.policyRequest.data()[input.fieldKey][field];
+            const expressionFunction = this.expressions.getExpression({ expressionName: expressionIdentifier as AllowedExpressions });
             
             if(!expressionFunction) return { grant: Grant.DENY, 
                                              reason: `'${field}' inexistent expression.` }

@@ -1,6 +1,5 @@
 import { Entity, PropsWithDefaultFields } from "./entity";
 import { z } from "zod";
-import { AllowedExpressions } from "../../expressions";
 
 const policySchema = z.object({
     name: z.string().transform(val => String(val)),
@@ -8,24 +7,22 @@ const policySchema = z.object({
     effect: z.enum(['allow', 'deny']),
     appliesTo: z.array(z.string()).transform(array => array.map(val => String(val))),
     actions: z.record(z.object({
-        expression: z.enum([ "equalTo", "differentOf", "matchesWithEmailDomain", "hourGreaterThan", "hourLowerThan" ]),
+        expression: z.string(),
         value: z.any()
     })),
     subjects: z.record(z.object({
-        expression: z.enum([ "equalTo", "differentOf", "matchesWithEmailDomain", "hourGreaterThan", "hourLowerThan" ]),
+        expression: z.string(),
         value: z.any()
     })),
     resource: z.record(z.object({
-        expression: z.enum([ "equalTo", "differentOf", "matchesWithEmailDomain", "hourGreaterThan", "hourLowerThan" ]),
+        expression: z.string(),
         value: z.any()
     })),
     context: z.record(z.object({
-        expression: z.enum([ "equalTo", "differentOf", "matchesWithEmailDomain", "hourGreaterThan", "hourLowerThan" ]),
+        expression: z.string(),
         value: z.any()
     }))
 });
-
-export type AttributeField = Record<string, { value?: any; expression: AllowedExpressions; }>;
 
 const PolicySchemaInput = policySchema._input;
 const PolicySchemaOutput = policySchema._output;
